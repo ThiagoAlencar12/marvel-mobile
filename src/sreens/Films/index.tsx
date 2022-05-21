@@ -1,77 +1,41 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, SafeAreaView } from "react-native";
+import { ActivityIndicator, Button, SafeAreaView, Text } from "react-native";
 
 import {
   Container,
   CardsContent,
   ContainerList,
-  CardGroup,
   Filter,
   InputFilter,
   List,
   Content,
 } from "./styles";
-import api from "../../services/api";
 
 import { Card } from "../../components/Card";
 import { Header } from "../../components/Header";
-
-interface ResponseHeroesApi {
-  id: string;
-  name: string;
-  description: string;
-  thumbnail: {
-    path: string;
-    extension: string;
-  };
-}
+import { useFetchHeroes } from "../../hooks/useFetchMarvel";
+import { HeroesDTO } from "../../hooks/model";
 
 export function Films() {
-  const [heroes, setHeroes] = useState<ResponseHeroesApi[]>([]);
+  const { data, error, loading, nextPage } = useFetchHeroes();
 
-  const [heroeFilter, setHeroeFilter] = useState<string>('');
+  const [heroeFilter, setHeroeFilter] = useState<string>("");
 
-  useEffect(() => {
-    async function handleGetHeroes() {
-      const response = await api.get("/characters", {
-        params: {
-          limit: 10,
-        },
-      });
-    setHeroes(response.data.data.results);
-    } 
-    handleGetHeroes();
-  }, []);
+  if (error) {
+    return <Text> Ocorreu um erro ao buscar os heroes </Text>;
+  }
 
-  useEffect(() => {
-    if (heroeFilter === '') {
-      setHeroes(heroes);
-    } else {
-      setHeroes(
-        heroes.filter(
-          (item) =>
-            item.name.toLowerCase().indexOf(heroeFilter.toLowerCase()) > -1
-        )
-      );
-    }
-  }, [heroeFilter]);
-
-  const handleMoreHeroes = useCallback( async () => {
-    try {
-      const offset = heroes.length + 10;
-      
-      const response = await api.get("/characters", {
-        params: {
-          offset
-        }
-      });
-
-      setHeroes([...heroes, ...response.data.data.results]);
-    } catch(err) {
-      console.log(err);
-    }
-  }, [heroes])
-
+  const Heroe = ({ heroe }: { heroe: HeroesDTO }) => {
+    return (
+      <Card
+        key={heroe.id}
+        avatar={`${heroe.thumbnail?.path}.${heroe.thumbnail?.extension}`}
+        title={heroe.name}
+        id_film={heroe.id}
+        description={heroe.description}
+      />
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -91,22 +55,18 @@ export function Films() {
               <List
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
-                data={ heroes }
+                data={data}
                 keyExtractor={(item) => item.id?.toString()}
-                renderItem={({ item }) => (
-                  <Card
-                    key={item.id}
-                    avatar={`${item.thumbnail?.path}.${item.thumbnail?.extension}`}
-                    title={item.name}
-                    id_film={item.id}
-                    description={item.description}
-                  />
-                )}
+                onEndReached={nextPage}
+                onEndReachedThreshold={0.1}
+                ListFooterComponent={
+                  loading ? <ActivityIndicator size="large" /> : null
+                }
+                renderItem={({ item }) => <Heroe heroe={item} />}
               />
             </ContainerList>
           </CardsContent>
         </Content>
-        <Button title="Carregar mais" onPress={handleMoreHeroes} />
       </Container>
     </SafeAreaView>
   );
