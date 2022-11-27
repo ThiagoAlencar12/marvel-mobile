@@ -1,4 +1,4 @@
-import styled from 'styled-components/native'
+import styled from "styled-components/native";
 
 export const Container = styled.TouchableOpacity`
   min-width: 90%;
@@ -11,26 +11,25 @@ export const Container = styled.TouchableOpacity`
   align-items: center;
 
   margin: 10px 8px;
-  border: 2px solid #c93030;
+  border: 2px solid #85d7ff;
 
   border-radius: 10px;
-`
+`;
 
 export const Title = styled.Text`
   font-size: 16px;
   margin: 10px 0;
-  color: #495BCC;
+  color: #ff7849;
   font-weight: 700;
-  text-align: center;
+  text-align: justify;
 `;
 
 export const Description = styled.Text`
-  text-align: center;
+  text-align: justify;
   line-height: 13px;
   font-size: 12px;
-  color: #495BCC;
+  color: #ff7849;
   font-weight: 700;
-
 `;
 
 export const DescriptionBox = styled.View`
@@ -38,10 +37,10 @@ export const DescriptionBox = styled.View`
 `;
 
 export const AvatarHeroe = styled.Image`
-  border-radius: 60px;
+  border-radius: 10px;
   padding: 10px;
-  width: 66px;
-  height: 68px;
+  width: 100px;
+  height: 100px;
 `;
 
 export const Content = styled.View`

@@ -3,10 +3,10 @@ import { HeroesDTO } from "./model";
 
 import api from "../services/api";
 
-async function handleFetchHeroes(page: number) {
+async function handleFetchHeroes(limit: number) {
   const response = await api.get("/characters", {
     params: {
-      page,
+      limit: limit,
     },
   });
 
@@ -16,13 +16,8 @@ async function handleFetchHeroes(page: number) {
 export function useFetchHeroes() {
   const [data, setData] = useState<HeroesDTO[]>([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(10);
   const [error, setError] = useState(false);
-
-  function nextPage() {
-    if (loading) return;
-    setPage((prevState) => prevState + 1);
-  }
 
   useEffect(() => {
     async function fetchHeroes() {
@@ -39,5 +34,5 @@ export function useFetchHeroes() {
     fetchHeroes();
   }, [page]);
 
-  return { data, loading, error, nextPage };
+  return { data, loading, error };
 }

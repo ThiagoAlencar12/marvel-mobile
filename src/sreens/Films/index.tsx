@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Button, SafeAreaView, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, SafeAreaView, Text } from "react-native";
 
 import {
   Container,
@@ -13,18 +13,16 @@ import {
 
 import { Card } from "../../components/Card";
 import { Header } from "../../components/Header";
-import { useFetchHeroes } from "../../hooks/useFetchMarvel";
 import { HeroesDTO } from "../../hooks/model";
+import api from "../../services/api";
+import { useFetchHeroes } from "../../hooks/useFetchMarvel";
 
 export function Films() {
-  const { data, error, loading, nextPage } = useFetchHeroes();
-
   const [heroeFilter, setHeroeFilter] = useState<string>("");
+  const [filteredHeroe, setFilteredHeroe] = useState<HeroesDTO[]>([]);
 
-  if (error) {
-    return <Text> Ocorreu um erro ao buscar os heroes </Text>;
-  }
-
+  const { data, loading, error } = useFetchHeroes();
+  //https://www.youtube.com/watch?v=c3Befjw4CG8
   const Heroe = ({ heroe }: { heroe: HeroesDTO }) => {
     return (
       <Card
@@ -37,14 +35,46 @@ export function Films() {
     );
   };
 
+  // useEffect(() => {
+  //   setLoading(true);
+  //   async function handleGet() {
+  //     const response = await api.get("/characters", {
+  //       params: {
+  //         limit: 20,
+  //       },
+  //     });
+  //     setHeroeArray(response.data.data.results);
+  //     setLoading(false);
+  //   }
+  //   handleGet();
+  // }, []);
+
+  useEffect(() => {
+    async function handleFilter() {
+      if (heroeFilter === "") {
+        setFilteredHeroe(data);
+      } else {
+        setFilteredHeroe(
+          data.filter(
+            (item) =>
+              item.name.toLowerCase().indexOf(heroeFilter.toLowerCase()) > -1
+          )
+        );
+      }
+    }
+    handleFilter();
+  }, [heroeFilter]);
+
+  if (error) {
+    return <Text>Errei</Text>;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Header />
       <Container>
         <Filter>
           <InputFilter
-            placeholderTextColor="#C53030"
-            placeholder="Digite o nome do heroi..."
             value={heroeFilter}
             onChangeText={(text) => setHeroeFilter(text)}
           />
@@ -55,10 +85,8 @@ export function Films() {
               <List
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
-                data={data}
+                data={filteredHeroe}
                 keyExtractor={(item) => item.id?.toString()}
-                onEndReached={nextPage}
-                onEndReachedThreshold={0.1}
                 ListFooterComponent={
                   loading ? <ActivityIndicator size="large" /> : null
                 }
