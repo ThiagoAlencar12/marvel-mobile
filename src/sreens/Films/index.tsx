@@ -35,20 +35,6 @@ export function Films() {
     );
   };
 
-  // useEffect(() => {
-  //   setLoading(true);
-  //   async function handleGet() {
-  //     const response = await api.get("/characters", {
-  //       params: {
-  //         limit: 20,
-  //       },
-  //     });
-  //     setHeroeArray(response.data.data.results);
-  //     setLoading(false);
-  //   }
-  //   handleGet();
-  // }, []);
-
   useEffect(() => {
     async function handleFilter() {
       if (heroeFilter === "") {
