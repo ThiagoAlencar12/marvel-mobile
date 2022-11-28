@@ -16,12 +16,20 @@ export function Card({ title, avatar, id_film, description }: CardProps) {
   return (
     <Container
       activeOpacity={0.7}
-      onPress={() => navigation.navigate("FilmDetail", { id: id_film })}
+      onPress={() =>
+        navigation.navigate("FilmDetail", {
+          id: id_film,
+          name: title,
+          image: avatar,
+        })
+      }
     >
       <AvatarHeroe source={{ uri: avatar }}></AvatarHeroe>
       <Content>
         <Title>Heroi: {title}</Title>
-        <Description>Descrição: {description ? description : "Sem descrição"}</Description>
+        <Description>
+          Descrição: {description ? description : "Sem descrição"}
+        </Description>
       </Content>
     </Container>
   );

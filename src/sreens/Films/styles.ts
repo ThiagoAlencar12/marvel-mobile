@@ -1,9 +1,10 @@
 import { FlatList } from "react-native-gesture-handler";
 import styled from "styled-components/native";
+import { theme } from "../../global/styles/themes";
 
 export const Container = styled.View`
   flex: 1;
-  background-color: #0A1033;
+  background-color: ${theme.colors.background};
   align-items: center;
 `;
 
@@ -33,17 +34,9 @@ export const Actions = styled.View`
 `;
 
 export const FooterText = styled.Text`
-  color: #7A7A80;
+  color: #7a7a80;
   font-size: 13px;
   line-height: 14px;
-`;
-
-export const CardsContent = styled.View`  
-  flex: 1;
-  width: 90%;
-  margin: 0 auto;
-  align-items: center;
-  justify-content: center;
 `;
 
 export const ContainerList = styled.View`
@@ -51,6 +44,8 @@ export const ContainerList = styled.View`
   align-items: center;
   justify-content: center;
   height: 50%;
+  margin: 0 auto;
+  padding: 0 15px;
   flex: 1;
 `;
 
@@ -64,10 +59,13 @@ export const CardGroup = styled.View`
   flex-direction: row;
 `;
 
-export const InputFilter = styled.TextInput`
-  border: 2px solid #c93030;
-  padding: 5px;
-  color: #C53030;
+export const InputFilter = styled.TextInput.attrs({
+  placeholderTextColor: "#85d7ff",
+  placeholder: "Digite o nome do heroi...",
+})`
+  border: 2px solid #85d7ff;
+  padding: 14px 16px;
+  color: #85d7ff;
   border-radius: 10px;
   width: 85%;
 `;

@@ -1,14 +1,14 @@
 import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text } from "react-native";
-
-import { Header } from "../../components/Header";
+import { ActivityIndicator, SafeAreaView, Text } from "react-native";
+import { useQuery } from "react-query";
 import api from "../../services/api";
 
 import { Container, List, ContainerList, Content } from "./styles";
 
 import { Title } from "../../components/Card/styles";
 import { CardHeroe } from "../../components/CardHeroeDetail";
+import { theme } from "../../global/styles/themes";
 
 interface ResponseHeroesApi {
   id: string;
@@ -28,61 +28,39 @@ interface ResponseComics {
 export function FilmDetail() {
   const route = useRoute();
 
-  const [heroeById, setHeroeById] = useState<ResponseHeroesApi[]>([]);
   const [events, setEvents] = useState<ResponseComics[]>([]);
 
-  //@ts-ignore
-  const { id } = route.params;
+  const { id, name } = route.params as {
+    id: string;
+    name: string;
+  };
 
-  useEffect(() => {
-    async function handleGetHeroeById() {
-      const response = await api.get(`/characters/${id}`);
+  const { isLoading } = useQuery(`/characters/${id}/events`, async () => {
+    const result = await api.get(`/characters/${id}/events`);
 
-      setHeroeById(response.data.data.results);
-    }
-    handleGetHeroeById();
-  }, [id]);
-
-  useEffect(() => {
-    async function handleGetHeroeById() {
-      const response = await api.get(`/characters/${id}/events`);
-
-      setEvents(response.data.data.results[0]?.comics.items);
-    }
-    handleGetHeroeById();
-  }, [id]);
+    setEvents(result.data.data.results[0]?.comics.items);
+    return;
+  });
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Header />
       <Container>
-        <Title style={{ color: "#495BCC" }}>Heroe: {heroeById[0]?.name}</Title>
-        <Title style={{ color: "#495BCC" }}>
-          Descrição:{" "}
-          {heroeById[0]?.description
-            ? heroeById[0]?.description
-            : "Sem descrição"}
-        </Title>
+        <Title>Herói {name}</Title>
         <Content>
           <ContainerList>
-            {events ? (
+            {!isLoading && events.length > 1 ? (
               <List
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              numColumns={2}
-              data={events}
-              keyExtractor={(item) => item.name}
-              renderItem={({ item }) => (
-                <CardHeroe
-                  key={item.id}
-                  title={item.name}
-                />
-              )}
-            />
-            ): (
-              <Text
-                style={{ fontSize: 20, color: '#495BCC' }}
-              > Sem Eventos </Text>
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                numColumns={2}
+                data={events}
+                keyExtractor={(item) => item.name}
+                renderItem={({ item }) => (
+                  <CardHeroe key={item.id} title={item.name} />
+                )}
+              />
+            ) : (
+              <ActivityIndicator size="large" color={theme.colors.heading} />
             )}
           </ContainerList>
         </Content>

@@ -1,15 +1,13 @@
 import React from "react";
-import { useNavigation } from "@react-navigation/native";
 
-import { Container, Title, AvatarHeroe, Content } from "./styles";
-
+import { Container, Title, Content } from "./styles";
 interface CardProps {
   title: string;
 }
 
 export function CardHeroe({ title }: CardProps) {
   return (
-    <Container activeOpacity={0.7}>
+    <Container>
       <Content>
         <Title>Heroi: {title}</Title>
       </Content>
