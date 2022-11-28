@@ -39,19 +39,13 @@ export const FooterText = styled.Text`
   line-height: 14px;
 `;
 
-export const CardsContent = styled.View`
-  flex: 1;
-  width: 90%;
-  margin: 0 auto;
-  align-items: center;
-  justify-content: center;
-`;
-
 export const ContainerList = styled.View`
   width: 100%;
   align-items: center;
   justify-content: center;
   height: 50%;
+  margin: 0 auto;
+  padding: 0 15px;
   flex: 1;
 `;
 

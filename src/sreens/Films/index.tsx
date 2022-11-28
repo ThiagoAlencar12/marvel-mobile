@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, SafeAreaView, Text } from "react-native";
+import { ActivityIndicator, SafeAreaView, Text, FlatList } from "react-native";
+import { useQuery } from "react-query";
 
 import {
   Container,
-  CardsContent,
   ContainerList,
   Filter,
   InputFilter,
@@ -13,36 +13,36 @@ import {
 
 import { Card } from "../../components/Card";
 import { Header } from "../../components/Header";
-import { HeroesDTO } from "../../hooks/model";
+import { HeroesDTO } from "../../models/model";
 import api from "../../services/api";
-import { useFetchHeroes } from "../../hooks/useFetchMarvel";
+import { theme } from "../../global/styles/themes";
 
 export function Films() {
   const [heroeFilter, setHeroeFilter] = useState<string>("");
-  const [filteredHeroe, setFilteredHeroe] = useState<HeroesDTO[]>([]);
+  const [heroes, setHeroes] = useState<HeroesDTO[]>([]);
 
-  const { data, loading, error } = useFetchHeroes();
-  //https://www.youtube.com/watch?v=c3Befjw4CG8
-  const Heroe = ({ heroe }: { heroe: HeroesDTO }) => {
-    return (
-      <Card
-        key={heroe.id}
-        avatar={`${heroe.thumbnail?.path}.${heroe.thumbnail?.extension}`}
-        title={heroe.name}
-        id_film={heroe.id}
-        description={heroe.description}
-      />
-    );
-  };
+  const {
+    data: heroeResult,
+    isLoading,
+    isError,
+  } = useQuery("/characters", async () => {
+    const result = await api.get("/characters", {
+      params: {
+        limit: 20,
+      },
+    });
+    setHeroes(result.data.data.results);
+    return result.data.data.results;
+  });
 
   useEffect(() => {
     async function handleFilter() {
       if (heroeFilter === "") {
-        setFilteredHeroe(data);
+        setHeroes(heroeResult);
       } else {
-        setFilteredHeroe(
-          data.filter(
-            (item) =>
+        setHeroes(
+          heroeResult.filter(
+            (item: HeroesDTO) =>
               item.name.toLowerCase().indexOf(heroeFilter.toLowerCase()) > -1
           )
         );
@@ -51,8 +51,8 @@ export function Films() {
     handleFilter();
   }, [heroeFilter]);
 
-  if (error) {
-    return <Text>Errei</Text>;
+  if (isError) {
+    return <Text>Erro ao carregar os dados</Text>;
   }
 
   return (
@@ -66,20 +66,27 @@ export function Films() {
           />
         </Filter>
         <Content>
-          <CardsContent>
-            <ContainerList>
-              <List
+          <ContainerList>
+            {isLoading ? (
+              <ActivityIndicator size="large" color={theme.colors.heading} />
+            ) : (
+              <FlatList
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
-                data={filteredHeroe}
-                keyExtractor={(item) => item.id?.toString()}
-                ListFooterComponent={
-                  loading ? <ActivityIndicator size="large" /> : null
-                }
-                renderItem={({ item }) => <Heroe heroe={item} />}
+                data={heroes}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <Card
+                    key={item.id}
+                    avatar={`${item.thumbnail?.path}.${item.thumbnail?.extension}`}
+                    title={item.name}
+                    id_film={item.id}
+                    description={item.description}
+                  />
+                )}
               />
-            </ContainerList>
-          </CardsContent>
+            )}
+          </ContainerList>
         </Content>
       </Container>
     </SafeAreaView>
